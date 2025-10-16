@@ -1,11 +1,14 @@
-export default async function handler(req, res) {
+const { Daily } = require('@daily-co/daily-js');
+
+module.exports = async (req, res) => {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.status(200).end();
+    return;
   }
 
   if (req.method !== 'POST') {
@@ -13,14 +16,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Simple response - we'll add Daily.co API later
-    const roomId = 'room' + Date.now();
-    const roomUrl = `https://parifermance.daily.co/${roomId}`;
+    const daily = Daily({ 
+      apiKey: '46ee5e47e60c855179a8218ae8e831fb8e735f40b139170e93a2b1fa76ac106e'
+    });
+    
+    const room = await daily.createRoom();
     
     res.status(200).json({
       success: true,
-      roomUrl: roomUrl,
-      message: 'Room URL generated'
+      roomUrl: room.url
     });
     
   } catch (error) {
@@ -29,4 +33,4 @@ export default async function handler(req, res) {
       error: error.message
     });
   }
-}
+};
